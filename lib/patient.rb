@@ -1,9 +1,10 @@
 class Patient
-  attr_reader(:name, :birthdate)
+  attr_reader(:name, :birthdate, :id)
   
   def initialize(attributes)
     @name = attributes.fetch(:name)
     @birthdate = attributes.fetch(:birthdate)
+    @id = attributes.fetch(:id)
   end
   
   def self.all()
