@@ -5,6 +5,8 @@ require('./lib/patient')
 require('./lib/doctor')
 also_reload('lib/**/*.rb')
 
+DB = PG.connect({:dbname => "clinic"})
+
 get('/') do
   @doctors = Doctor.all()
   @header = "Doctors"
@@ -16,7 +18,7 @@ post('/new') do
   specialty = params.fetch('specialty')
   @doctor = Doctor.new({:name => name, :specialty => specialty, :id => nil})
   @doctor.save()
-  @patients = Patient.all()
+  @patients = @doctor.patients()
   @header = "#{@doctor.name()}, #{@doctor.specialty()}"
   erb(:doctor)
 end
@@ -24,7 +26,7 @@ end
 get('/:id') do
   @doctor = Doctor.find(params.fetch('id').to_i())
   @header = "#{@doctor.name()}, #{@doctor.specialty()}"
-  @patients = Patient.all()
+  @patients = @doctor.patients()
   erb(:doctor)
 end
 
@@ -33,8 +35,8 @@ post('/:id') do
   @header = "#{@doctor.name()}, #{@doctor.specialty()}"
   name = params.fetch('name')
   birthdate = params.fetch('birthdate')
-  @patient = Patient.new(:name => name, :birthdate => birthdate, :id => nil)
+  @patient = Patient.new(:name => name, :birthdate => birthdate, :id => nil, :doctor_id => @doctor.id())
   @patient.save()
-  @patients = Patient.all()
+  @patients = @doctor.patients()
   erb(:doctor)
 end
